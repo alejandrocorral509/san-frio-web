@@ -399,7 +399,7 @@ body.menu-open .drawer { opacity: 1; visibility: visible; transform: none; }
 .sizer-reset:hover { border-color: #fff; }
 .sizer-small { display: block; margin-top: 8px; font-size: 13.5px; color: rgba(255,255,255,.7); }
 
-.grid-sep { grid-column: 1 / -1; margin: 26px 0 4px; padding-top: 22px; border-top: 1px solid var(--line); font: 500 13px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--mute); }
+.grid-sep { grid-column: 1 / -1; margin: 26px 0 4px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 16px; font-weight: 600; color: var(--ink-2); }
 .grid-sep[hidden] { display: none; }
 
 /* tarjeta */
