@@ -200,6 +200,37 @@
 
   function initYear() { var y = $('#year'); if (y) y.textContent = new Date().getFullYear(); }
 
+  /* Mapa de Google solo cuando el visitante lo pide */
+  function initMap() {
+    var btn = $('#map-load'), box = $('#map');
+    if (!btn || !box) return;
+    btn.addEventListener('click', function () {
+      box.innerHTML = '<iframe title="Mapa: San Frío, Polígono Bertola 28, Jerez" src="https://www.google.com/maps?q=Pol%C3%ADgono+Bertola+28,+11408+Jerez+de+la+Frontera&output=embed" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>';
+    });
+  }
+
+  /* Enlaces desde la web antigua: ?p=producto o ?cat=categoria */
+  var CAT = {
+    'climatizacion': 'clima', 'split-multisplit': 'clima', 'conductos': 'clima', 'cassetes': 'clima', 'suelo-techo': 'clima',
+    'purificadores': 'aire', 'covid-19': 'aire', 'calefactores': 'calor', 'hosteleria': 'calor',
+    'aerotermia': 'energia', 'placas-solares': 'energia',
+    'electrodomesticos': 'hogar', 'hornos-de-mesa': 'hogar', 'hornos-de-mesa-electrodomesticos': 'hogar', 'microondas': 'hogar', 'microondas-electrodomesticos': 'hogar',
+    'placas-de-induccion': 'hogar', 'placas-de-induccion-electrodomesticos': 'hogar', 'televisores': 'hogar', 'televisores-electrodomesticos': 'hogar',
+    'vitroceramica': 'hogar', 'vitroceramica-electrodomesticos': 'hogar',
+    'electricidad': 'electricidad', 'material-electrico': 'electricidad', 'luces-led': 'electricidad',
+    'herramientas': 'herramientas', 'black-diamond': 'herramientas', 'material-de-instalacion': 'herramientas'
+  };
+  function initDeepLink() {
+    var q = new URLSearchParams(location.search), p = q.get('p'), c = q.get('cat');
+    if (c && CAT[c]) setFilter(CAT[c]);
+    if (p) {
+      var card = document.getElementById('p-' + p.replace(/[^a-z0-9-]/gi, ''));
+      if (!card) return;
+      card.classList.add('is-target');
+      setTimeout(function () { card.scrollIntoView({ block: 'center' }); }, 300);
+    }
+  }
+
   function boot() {
     safe(initHeroSafety, 'hero');
     safe(initThermo, 'thermo');
@@ -211,6 +242,8 @@
     safe(initTiles, 'tiles');
     safe(initAsk, 'ask');
     safe(initForm, 'form');
+    safe(initDeepLink, 'deeplink');
+    safe(initMap, 'map');
     safe(initParallax, 'parallax');
     safe(initYear, 'year');
   }

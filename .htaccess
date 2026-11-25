@@ -94,3 +94,21 @@
 #   RewriteCond %{REQUEST_FILENAME}.html -f
 #   RewriteRule ^(.+?)/?$ $1.html [L]
 # </IfModule>
+
+# ----- Redirecciones 301 desde la web antigua (WordPress / WooCommerce) -----
+# Conservan el posicionamiento en Google: cada producto lleva a su ficha en el
+# catálogo nuevo y cada categoría, al catálogo filtrado.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^producto/([a-z0-9-]+)/?$ /?p=$1#catalogo [R=301,NE,L]
+  RewriteRule ^product-category/(?:[^/]+/)*([a-z0-9-]+)/?$ /?cat=$1#catalogo [R=301,NE,L]
+  RewriteRule ^(tienda|shop|fichas-tecnicas)/?$ /#catalogo [R=301,NE,L]
+  RewriteRule ^quienes-somos/?$ /#empresa [R=301,NE,L]
+  RewriteRule ^contacta/?$ /#contacto [R=301,NE,L]
+  RewriteRule ^noticias(/.*)?$ /#noticias [R=301,NE,L]
+  RewriteRule ^aviso-legal/?$ /aviso-legal.html [R=301,L]
+  RewriteRule ^(politica-de-privacidad|cookies)/?$ /privacidad.html [R=301,L]
+  RewriteRule ^wp-login\.php$ / [R=301,L]
+</IfModule>
+
+ErrorDocument 404 /404.html

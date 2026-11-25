@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Página no encontrada · San Frío</title>
+  <meta name="robots" content="noindex">
+  <script>
+    /* Lleva las direcciones de la web antigua a su sitio en la nueva.
+       Funciona en cualquier alojamiento (también donde no hay .htaccess). */
+    (function () {
+      var path = location.pathname.replace(/\/+$/, '');
+      var base = path.indexOf('/san-frio-web') === 0 ? '/san-frio-web' : '';
+      var p = decodeURIComponent(path.slice(base.length)).toLowerCase(), m, to = null;
+      if ((m = p.match(/^\/producto\/([a-z0-9-]+)$/))) to = '/?p=' + m[1] + '#catalogo';
+      else if ((m = p.match(/^\/product-category\/(?:[^\/]+\/)*([a-z0-9-]+)$/))) to = '/?cat=' + m[1] + '#catalogo';
+      else if (/^\/(tienda|shop|fichas-tecnicas)$/.test(p)) to = '/#catalogo';
+      else if (p === '/quienes-somos') to = '/#empresa';
+      else if (p === '/contacta') to = '/#contacto';
+      else if (/^\/noticias(\/.*)?$/.test(p)) to = '/#noticias';
+      else if (p === '/aviso-legal') to = '/aviso-legal.html';
+      else if (/^\/(politica-de-privacidad|cookies)$/.test(p)) to = '/privacidad.html';
+      if (to) location.replace(base + to);
+    })();
+  </script>
+  <style>
+    body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0b1d2e; color: #fff; font: 400 17px/1.6 system-ui, sans-serif; text-align: center; padding: 24px; }
+    h1 { font: 800 clamp(40px, 8vw, 80px)/1 system-ui, sans-serif; letter-spacing: -.03em; margin: 0 0 14px; }
+    p { color: rgba(255,255,255,.78); margin: 0; }
+    .row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 26px; }
+    a { display: inline-flex; align-items: center; min-height: 48px; padding: 0 24px; border-radius: 999px; text-decoration: none; font-weight: 600; }
+    .a1 { background: #fff; color: #0b1d2e; }
+    .a2 { background: #c4401a; color: #fff; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Página no encontrada</h1>
+    <p>La página que busca no existe o ha cambiado de sitio.</p>
+    <div class="row">
+      <a class="a1" href="/" id="home">Ir al inicio</a>
+      <a class="a2" href="tel:+34956353150">Llamar · 956 353 150</a>
+    </div>
+  </main>
+  <script>
+    if (location.pathname.indexOf('/san-frio-web') === 0) document.getElementById('home').href = '/san-frio-web/';
+  </script>
+</body>
+</html>
