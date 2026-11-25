@@ -120,21 +120,50 @@
     io.observe(el);
   }
 
-  /* Catálogo: filtros + búsqueda */
+  /* Catálogo: variantes, filtros, búsqueda, guía de potencia y ficha */
   var setFilter = function () {};
+  var openCard = function () {};
+  var askFor = function () {};
+  function variantsOf(card) { try { return JSON.parse(card.getAttribute('data-variants')) || []; } catch (e) { return []; } }
+  function mediaHTML(v) {
+    return v.img ? '<img src="assets/img/' + v.img + '.webp?v=2" alt="' + v.model.replace(/"/g, '&quot;') + '" width="640" height="640">'
+                 : '<span class="p-ph"><span>Foto próximamente</span></span>';
+  }
+  function selectVariant(card, i) {
+    var vs = variantsOf(card), v = vs[i]; if (!v) return;
+    card._v = i;
+    var m = $('.p-media', card), img = $('img', m);
+    if (v.img && img) { img.src = 'assets/img/' + v.img + '.webp?v=2'; img.alt = v.model; }
+    $('.p-fact', card).textContent = v.fact;
+    var m2 = $('.p-m2', card); m2.hidden = !v.m2; m2.textContent = v.m2 ? 'Orientativo: ' + v.m2 : '';
+    $('.p-ask', card).setAttribute('data-product', v.model);
+    $$('.p-var button', card).forEach(function (b, k) { b.setAttribute('aria-pressed', String(k === i)); });
+  }
+
   function initCatalog() {
     var grid = $('#grid'), chips = $$('.chip'), search = $('#search'), count = $('#count'), empty = $('#empty');
     if (!grid) return;
-    var items = $$('.p', grid), group = 'all';
+    var items = $$('.p', grid), seps = $$('[data-sep]', grid), group = 'all', need = null;
     function norm(s) { return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
-    items.forEach(function (it) { it._txt = norm(it.getAttribute('data-name') + ' ' + it.textContent); });
+    items.forEach(function (it) {
+      it._txt = norm(it.getAttribute('data-name') + ' ' + it.textContent); it._v = 0;
+      $$('.p-var button', it).forEach(function (b) { b.addEventListener('click', function () { selectVariant(it, +b.getAttribute('data-i')); }); });
+    });
+    function fits(it) {
+      if (!need) return true;
+      var vs = variantsOf(it), best = -1;
+      vs.forEach(function (v, k) { if (best < 0 && v.frig && v.frig >= need[0] && v.frig <= need[1] * 1.35) best = k; });
+      if (best > -1 && it._v !== best) selectVariant(it, best);
+      return best > -1;
+    }
     function run() {
       var q = norm(search && search.value).trim(), n = 0;
       items.forEach(function (it) {
-        var ok = (group === 'all' || it.getAttribute('data-g') === group) && (!q || q.split(/\s+/).every(function (w) { return it._txt.indexOf(w) > -1; }));
+        var ok = (group === 'all' || it.getAttribute('data-g') === group) && (!q || q.split(/\s+/).every(function (w) { return it._txt.indexOf(w) > -1; })) && fits(it);
         it.hidden = !ok; if (ok) n++;
       });
-      count.textContent = n + (n === 1 ? ' producto' : ' productos');
+      seps.forEach(function (s) { s.hidden = !(group === 'all' && !q && !need); });
+      count.textContent = n + (n === 1 ? ' producto' : ' productos') + (need ? ' adecuados para ' + need[2] + ' m²' : '');
       empty.hidden = n > 0;
     }
     setFilter = function (g) {
@@ -142,9 +171,59 @@
       chips.forEach(function (c) { var on = c.getAttribute('data-g') === g; c.classList.toggle('is-on', on); c.setAttribute('aria-pressed', String(on)); });
       run();
     };
-    chips.forEach(function (c) { c.addEventListener('click', function () { setFilter(c.getAttribute('data-g')); }); });
+    var form = $('#sizer-form'), inp = $('#sizer-m2'), out = $('#sizer-out');
+    function clearNeed() { need = null; if (out) out.hidden = true; }
+    chips.forEach(function (c) { c.addEventListener('click', function () { clearNeed(); setFilter(c.getAttribute('data-g')); }); });
     if (search) search.addEventListener('input', run);
+
+    /* Guía de potencia: 100–125 frigorías por m² (orientativo, clima cálido) */
+    if (form) form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var a = Math.round(+inp.value);
+      if (!a || a < 5 || a > 200) { out.hidden = false; out.innerHTML = 'Indique una superficie entre 5 y 200 m².'; return; }
+      var lo = a * 100, hi = a * 125, f = function (x) { return x.toLocaleString('es-ES'); };
+      need = [lo, hi, a];
+      if (search) search.value = '';
+      setFilter('clima');
+      var n = items.filter(function (it) { return !it.hidden; }).length;
+      out.hidden = false;
+      out.innerHTML = 'Para <b>' + a + ' m²</b> necesita aproximadamente <b>' + f(lo) + '–' + f(hi) + ' frigorías</b>. ' +
+        (n ? 'Le mostramos debajo los equipos adecuados.' : 'Para esa superficie le recomendamos un estudio a medida: <a href="#contacto">pídanos presupuesto</a>.') +
+        ' <button type="button" class="sizer-reset">Quitar filtro</button>' +
+        '<span class="sizer-small">Es un cálculo orientativo: el aislamiento, la orientación y el uso cambian la potencia necesaria. Le asesoramos sin compromiso.</span>';
+      $('.sizer-reset', out).addEventListener('click', function () { clearNeed(); inp.value = ''; setFilter('all'); });
+    });
     run();
+
+    /* Ficha ampliada */
+    var dlg = $('#pd'), cur = null;
+    function fill() {
+      var vs = variantsOf(cur), v = vs[cur._v || 0];
+      $('#pd-media').innerHTML = mediaHTML(v);
+      $('#pd-cat').textContent = $('.p-cat', cur).textContent;
+      $('#pd-name').textContent = $('.p-name', cur).textContent;
+      $('#pd-model').textContent = 'Modelo: ' + v.model;
+      $('#pd-fact').textContent = v.fact;
+      var m = $('#pd-m2'); m.hidden = !v.m2; m.textContent = v.m2 ? 'Superficie orientativa: ' + v.m2 : '';
+      var box = $('#pd-var'); box.innerHTML = ''; box.hidden = vs.length < 2;
+      vs.forEach(function (x, k) {
+        var b = document.createElement('button'); b.type = 'button'; b.textContent = x.label; b.setAttribute('aria-pressed', String(k === (cur._v || 0)));
+        b.addEventListener('click', function () { selectVariant(cur, k); fill(); }); box.appendChild(b);
+      });
+    }
+    openCard = function (card) {
+      if (!dlg || typeof dlg.showModal !== 'function') { askFor($('.p-ask', card).getAttribute('data-product')); return; }
+      cur = card; fill(); dlg.showModal();
+    };
+    items.forEach(function (it) {
+      $('.p-media', it).addEventListener('click', function () { openCard(it); });
+      $('.p-more', it).addEventListener('click', function () { openCard(it); });
+    });
+    if (dlg) {
+      $('.pd-close', dlg).addEventListener('click', function () { dlg.close(); });
+      dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+      $('#pd-ask').addEventListener('click', function () { var v = variantsOf(cur)[cur._v || 0]; dlg.close(); askFor(v.model); });
+    }
   }
 
   /* Tarjetas de soluciones → filtran el catálogo */
@@ -157,15 +236,14 @@
   /* Botón "Consultar" → rellena el formulario */
   function initAsk() {
     var asunto = $('#asunto'), msg = $('#mensaje'), contact = $('#contacto');
-    $$('.p-ask').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var name = b.getAttribute('data-product');
-        if (asunto) asunto.value = 'Consulta: ' + name;
-        if (msg && !msg.value.trim()) msg.value = 'Hola, me interesa el producto «' + name + '». ¿Podrían indicarme precio, disponibilidad e instalación?';
-        if (contact) contact.scrollIntoView({ behavior: 'smooth' });
-        setTimeout(function () { var f = $('#form input[name="nombre"]'); if (f) f.focus({ preventScroll: true }); }, 700);
-      });
-    });
+    askFor = function (name) {
+      if (asunto) asunto.value = 'Consulta: ' + name;
+      if (msg && (!msg.value.trim() || msg._auto)) { msg.value = 'Hola, me interesa el producto «' + name + '». ¿Podrían indicarme precio, disponibilidad e instalación?'; msg._auto = true; }
+      if (contact) contact.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(function () { var f = $('#form input[name="nombre"]'); if (f) f.focus({ preventScroll: true }); }, 700);
+    };
+    if (msg) msg.addEventListener('input', function () { msg._auto = false; });
+    $$('.p-ask').forEach(function (b) { b.addEventListener('click', function () { askFor(b.getAttribute('data-product')); }); });
   }
 
   /* Formulario → correo preparado */
@@ -224,8 +302,10 @@
     var q = new URLSearchParams(location.search), p = q.get('p'), c = q.get('cat');
     if (c && CAT[c]) setFilter(CAT[c]);
     if (p) {
-      var card = document.getElementById('p-' + p.replace(/[^a-z0-9-]/gi, ''));
+      p = p.replace(/[^a-z0-9-]/gi, '');
+      var card = $$('.p').filter(function (el) { return (' ' + el.getAttribute('data-slugs') + ' ').indexOf(' ' + p + ' ') > -1; })[0];
       if (!card) return;
+      variantsOf(card).forEach(function (v, k) { if (v.slugs.indexOf(p) > -1) selectVariant(card, k); });
       card.classList.add('is-target');
       setTimeout(function () { card.scrollIntoView({ block: 'center' }); }, 300);
     }
