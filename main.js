@@ -270,8 +270,8 @@
   function initParallax() {
     if (!window.gsap || !window.ScrollTrigger) return;
     gsap.registerPlugin(ScrollTrigger);
-    $$('.tile img').forEach(function (img) {
-      gsap.fromTo(img, { yPercent: 6 }, { yPercent: -6, ease: 'none', scrollTrigger: { trigger: img.parentNode, start: 'top bottom', end: 'bottom top', scrub: true } });
+    $$('.sol-stage img').forEach(function (img) {
+      gsap.fromTo(img, { yPercent: 4 }, { yPercent: -4, ease: 'none', scrollTrigger: { trigger: img.parentNode, start: 'top bottom', end: 'bottom top', scrub: true } });
     });
     window.addEventListener('load', function () { ScrollTrigger.refresh(); });
   }
@@ -311,6 +311,14 @@
     }
   }
 
+  /* Soluciones: número de productos de cada línea, sacado del catálogo */
+  function initSolCounts() {
+    $$('[data-count-g]').forEach(function (el) {
+      var n = $$('.p[data-g="' + el.getAttribute('data-count-g') + '"]').length;
+      if (n) el.textContent = n + (n === 1 ? ' producto' : ' productos');
+    });
+  }
+
   function boot() {
     safe(initHeroSafety, 'hero');
     safe(initThermo, 'thermo');
@@ -320,6 +328,7 @@
     safe(initCounter, 'counter');
     safe(initCatalog, 'catalog');
     safe(initTiles, 'tiles');
+    safe(initSolCounts, 'solcounts');
     safe(initAsk, 'ask');
     safe(initForm, 'form');
     safe(initDeepLink, 'deeplink');
