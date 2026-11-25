@@ -124,11 +124,11 @@ body.menu-open .drawer { opacity: 1; visibility: visible; transform: none; }
 .thermo-temp { font-weight: 300; font-stretch: 75%; font-size: clamp(76px, 9vw, 116px); line-height: 1; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
 .thermo-temp sup { font-size: .3em; font-weight: 500; vertical-align: top; position: relative; top: .5em; margin-left: 2px; }
 .thermo-note { font-size: 14px; color: rgba(255,255,255,.7); margin-top: 6px; }
-.thermo-range { display: flex; align-items: center; gap: 12px; font: 500 13px var(--mono); color: rgba(255,255,255,.6); }
+.thermo-range { display: flex; align-items: center; gap: 12px; font: 500 13px var(--mono); color: rgba(255,255,255,.75); }
 .thermo-range input { flex: 1; -webkit-appearance: none; appearance: none; height: 6px; border-radius: 6px; background: linear-gradient(90deg, var(--cold), #b6c9d6 50%, var(--hot)); cursor: pointer; }
 .thermo-range input::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 5px solid var(--temp); box-shadow: 0 4px 14px rgba(0,0,0,.35); }
 .thermo-range input::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 5px solid var(--temp); }
-.thermo-hint { font-size: 13.5px; color: rgba(255,255,255,.55); margin: 14px 0 0; }
+.thermo-hint { font-size: 13.5px; color: rgba(255,255,255,.72); margin: 14px 0 0; }
 
 .hero-facts { position: relative; list-style: none; margin-top: clamp(50px, 8vh, 90px); padding-top: 26px; padding-bottom: 34px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; border-top: 1px solid rgba(255,255,255,.12); }
 .hero-facts li { display: flex; flex-direction: column; gap: 4px; }
@@ -225,7 +225,7 @@ body.menu-open .drawer { opacity: 1; visibility: visible; transform: none; }
 /* ---------- Noticias ---------- */
 .news { padding: clamp(90px, 11vw, 140px) 0; }
 .news-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.post { background: #fff; border-radius: var(--r); padding: 28px; border-top: 3px solid var(--blue); }
+.post { background: #fff; border-radius: var(--r); padding: 28px; }
 .post time { font: 500 13px var(--mono); color: var(--mute); }
 .post h3 { font-weight: 700; font-stretch: 90%; font-size: 22px; line-height: 1.15; margin: 12px 0 10px; }
 .post p { margin: 0; color: var(--ink-2); font-size: 15.5px; }
